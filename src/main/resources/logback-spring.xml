@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+  <!-- Customised from Spring defaults to add MDC at end of log message -->
+  <variable scope="context" name="consoleMDCPattern" value="%replace(, mdc: %mdc){'^, mdc: $', ''}"/>
+  <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m${consoleMDCPattern}%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+
+        <timestamp>
+          <timeZone>UTC</timeZone>
+        </timestamp>
+
+        <logLevel/>
+
+        <loggerName>
+          <fieldName>logger.name</fieldName>
+        </loggerName>
+        <threadName>
+          <fieldName>logger.thread_name</fieldName>
+        </threadName>
+
+        <stackTrace>
+          <fieldName>error.stack</fieldName>
+          <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+            <maxDepthPerThrowable>50</maxDepthPerThrowable>
+            <maxLength>16384</maxLength>
+            <shortenedClassNameLength>30</shortenedClassNameLength>
+            <exclude>sun\.reflect\..*\.invoke.*</exclude>
+            <exclude>net\.sf\.cglib\.proxy\.MethodProxy\.invoke</exclude>
+            <rootCauseFirst>true</rootCauseFirst>
+          </throwableConverter>
+        </stackTrace>
+
+        <mdc>
+          <fieldName>mdc</fieldName>
+          <!-- The below are added under two keys for compatibility, so we can ignore one here -->
+          <excludeMdcKeyName>X-Span-Export</excludeMdcKeyName>
+          <excludeMdcKeyName>X-B3-SpanId</excludeMdcKeyName>
+          <excludeMdcKeyName>X-B3-TraceId</excludeMdcKeyName>
+          <excludeMdcKeyName>X-B3-ParentSpanId</excludeMdcKeyName>
+        </mdc>
+
+        <message/>
+
+      </providers>
+    </encoder>
+  </appender>
+
+  <root level="${APP_LOGGING_LEVEL:-INFO}">
+    <appender-ref ref="console"/>
+  </root>
+</configuration>

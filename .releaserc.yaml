@@ -1,0 +1,17 @@
+---
+branches:
+  - main
+repositoryUrl: https://github.com/liatrio/dks-api.git
+preset: conventionalcommits
+tagFormat: "v${version}"
+plugins:
+  - '@semantic-release/commit-analyzer'
+  - '@semantic-release/release-notes-generator'
+  - path: '@semantic-release/changelog'
+    changelogFile: 'CHANGELOG.md'
+  - path: '@semantic-release/git'
+    assets:
+      - 'CHANGELOG.md'
+  - path: '@semantic-release/github'
+    failComment: false
+    successComment: false

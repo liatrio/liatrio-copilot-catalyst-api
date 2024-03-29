@@ -1,0 +1,43 @@
+fqdn: dks-api-qa.nonprod-internal.liatrio.com
+environment: qa
+teamname: dojo
+namespace: dojo-qa
+reponame: dks-api
+green:
+  name: green
+  image:
+    registry: liatrioECRID.dkr.ecr.us-east-2.amazonaws.com
+    repository: dks-api
+    pullPolicy: IfNotPresent
+    tag: latest
+  ports:
+    - name: http
+      containerPort: 8080
+      protocol: TCP
+  env:
+    - name: "DEPLOYMENT_TYPE"
+      value: green
+    - name: "spring_profiles_active"
+      value: "qa"
+  livenessProbe:
+    httpGet:
+      path: /actuator/health/app
+      port: http
+    initialDelaySeconds: 75
+    periodSeconds: 2
+  readinessProbe:
+    httpGet:
+      path: /actuator/health/app
+      port: http
+    initialDelaySeconds: 40
+    periodSeconds: 2
+  resources:
+    limits:
+      cpu: 1.5
+      memory: 1Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
+gateway:
+  enabled: true
+  tlsCredentialName: dojo-qa-dks-api-cert

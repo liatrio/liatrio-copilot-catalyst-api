@@ -1,0 +1,142 @@
+# Default values for dks-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+nameOverride: ""
+fullnameOverride: ""
+replicaCount: 3
+imagePullSecrets: []
+environment: ENV
+teamname: dojo
+namespace: NAMESPACE
+
+blue:
+  enabled: true
+green:
+  enabled: false
+
+productionSlot: blue
+
+gateway:
+  enabled: true
+
+image:
+  registry: $ECR_URL
+  repository: dks-api
+  pullPolicy: IfNotPresent
+  tag: latest
+
+recreatePods: false
+
+deployment:
+  blue:
+    name: blue
+    image:
+      registry: liatrioECRID.dkr.ecr.us-east-2.amazonaws.com
+      repository: dks-api
+      pullPolicy: IfNotPresent
+      tag: latest
+    ports:
+      - name: http
+        containerPort: 8080
+        protocol: TCP
+    env: []
+    livenessProbe:
+      httpGet:
+        path: /actuator/health/app
+        port: http
+      initialDelaySeconds: 75
+      periodSeconds: 2
+    readinessProbe:
+      httpGet:
+        path: /actuator/health/app
+        port: http
+      initialDelaySeconds: 40
+      periodSeconds: 2
+    resources:
+      limits:
+        cpu: 1.5
+        memory: 1Gi
+      requests:
+        cpu: 1
+        memory: 1Gi
+
+  green:
+    name: green
+    image:
+      registry: liatrioECRID.dkr.ecr.us-east-2.amazonaws.com
+      repository: dks-api
+      pullPolicy: IfNotPresent
+      tag: latest
+    ports:
+      - name: http
+        containerPort: 8080
+        protocol: TCP
+    env: []
+    livenessProbe:
+      httpGet:
+        path: /actuator/health/app
+        port: http
+      initialDelaySeconds: 75
+      periodSeconds: 2
+    readinessProbe:
+      httpGet:
+        path: /actuator/health/app
+        port: http
+      initialDelaySeconds: 40
+      periodSeconds: 2
+    resources:
+      limits:
+        cpu: 1.5
+        memory: 1Gi
+      requests:
+        cpu: 1
+        memory: 1Gi
+  annotations:
+    liatrio.com/skipAppScanValidation: "public image"
+  pod:
+    annotations: {}
+
+virtualService:
+  name: blue
+  port: 80
+  headerName: x-env
+  headerValue: test
+
+service:
+  annotations:
+    ad.datadoghq.com/service.check_names: '["http_check"]'
+    ad.datadoghq.com/service.init_configs: "[{}]"
+    ad.datadoghq.com/service.instances: |
+      [
+          {
+            "name": "{{ include "dks-api.name" . }}.{{ .Release.namespace }}.svc.cluster.local",
+            "url": "http://{{ include "dks-api.name" . }}.{{ .Release.namespace }}.svc.cluster.local/diagnostic/status/heartbeat",
+            "timeout": 10,
+            "http_response_status_code": "200",
+            "ignore_ssl_warning": true,
+            "disable_ssl_validation": true,
+            "check_certificate_expiration": false,
+            "tags": ["liatrio-di:true", "check_url_type:internal", "service:{{ include "dks-api.name" . }}"]
+          },
+          {
+            "name": "{{ .Values.fqdn }}",
+            "url": "https://{{ .Values.fqdn }}/diagnostic/status/heartbeat,
+            "timeout": 10,
+            "http_response_status_code": "200",
+            "ignore_ssl_warning": true,
+            "disable_ssl_validation": true,
+            "check_certificate_expiration": false,
+            "tags": ["liatrio-di:true", "check_url_type:external", "service:{{ include "dks-api.name" . }}"]
+          }
+      ]
+  type: ClusterIP
+  containerPort: 8080
+  port: 80
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  minAvailable: 1
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 70

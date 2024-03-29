@@ -1,0 +1,15 @@
+fqdn: dks-api-dev.nonprod-internal.liatrio.com
+environment: dev
+teamname: dojo
+namespace: dojo-dev
+reponame: dks-api
+deployment:
+  green:
+    env:
+      - name: DEPLOYMENT_TYPE
+        value: green
+      - name: "spring_profiles_active"
+        value: "{{ .Values.environment }}"
+gateway:
+  enabled: true
+  tlsCredentialName: dojo-dev-dks-api-cert

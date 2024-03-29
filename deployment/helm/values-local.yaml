@@ -1,0 +1,30 @@
+image:
+  repository: dks-api
+  pullPolicy: IfNotPresent
+  tag: latest
+
+environment: local
+
+recreatePods: true
+
+autoscaling:
+  enabled: false
+
+replicaCount: 3
+
+service:
+  type: NodePort
+  nodePort: 30080
+  port: 80
+  containerPort: 8080
+
+resources:
+  limits:
+    cpu: 1.5
+    memory: 2Gi
+  requests:
+    cpu: 1
+    memory: 1Gi
+
+gateway:
+  enabled: false

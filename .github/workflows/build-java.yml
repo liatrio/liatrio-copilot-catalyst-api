@@ -1,0 +1,164 @@
+name: Build Java Project
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_call:
+    inputs:
+      tagTypes:
+        required: false
+        type: string
+        default: |
+          type=sha
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    name: Build and Test with Gradle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5  # v3.1.0
+
+      - name: Lint
+        run: echo TODO linting
+
+      - name: Unit Test
+        run: ./gradlew test
+
+      - name: Build JAR
+        run: ./gradlew bootJar
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
+        with:
+          name: dks-api
+          path: build/libs/devops-knowledge-share-api.jar
+
+  dependency-submission:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/dependency-submission@417ae3ccd767c252f5661f1ace9f835f9654f2b5  # v3.1.0
+
+  docker-build:
+    name: Build and Push Container Image
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.meta.outputs.json }}
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - name: Download JAR
+        uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
+        with:
+          name: dks-api
+          path: build/libs
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175 # v4
+        with:
+          images: |
+            ${{ env.REGISTRY }}/${{ github.repository }}
+          # when opened on pull request, no inputs are provided. when empty the
+          # defaults are used which produces pr-* as the tag to the image using
+          # the below information.
+          #   type=schedule,pattern=nightly,enable=true,priority=1000
+          #   type=ref,event=branch,enable=true,priority=600
+          #   type=ref,event=tag,enable=true,priority=600
+          #   type=ref,event=pr,prefix=pr-,enable=true,priority=600
+          tags: |
+            ${{ inputs.tagTypes }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@68827325e0b33c7199eb31dd4e31fbe9023e06e3 # v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@2b51285047da1547ffb1b2203d8be4c0af6b1f20 # v3
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@2cdde995de11925a030ce8070c3d77a52ffcf1c0 # v5
+        with:
+          push: true
+          context: .
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  scan:
+    needs: docker-build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.docker-build.outputs.matrix).tags }}
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ matrix.version }}
+          # exit-code: '1'
+          # ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+        env:
+          TRIVY_USERNAME: trivy
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3
+        with:
+          name: 'trivy-results'
+          path: 'trivy-results.sarif'
+
+      - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Snapshots
+        uses: aquasecurity/trivy-action@master
+        with:
+          format: 'github'
+          output: 'dependency-results.sbom.json'
+          image-ref: ${{ matrix.version }}
+          github-pat: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          TRIVY_USERNAME: trivy
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3
+        with:
+          name: 'trivy-sbom'
+          path: 'dependency-results.sbom.json'
+
+#      This can't be setup until we enable GHAS
+#      - name: Upload Trivy scan results to GitHub Security tab
+#        uses: github/codeql-action/upload-sarif@v2
+#        with:
+#          sarif_file: 'trivy-results.sarif'

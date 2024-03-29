@@ -1,0 +1,43 @@
+# This workflow is the main workflow on pushing to the main branch
+# and runs builds, releases, conventional commits, and pushes.
+
+name: Main
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-java:
+    uses: ./.github/workflows/build-java.yml
+    with:
+      tagTypes: |
+        type=sha
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-java]
+    outputs:
+      changed: ${{ steps.tag.outputs.changed }}
+      newVersion: ${{ steps.tag.outputs.newVersion }}
+    steps:
+      - name: Checkout code with commit history
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+        with:
+          fetch-depth: 0
+
+      - uses: liatrio/github-action-conventional-release@175f2e2567994ea2bd99fd6ad86a62c5fe894a12 # v0.2.0
+        id: tag
+        with:
+          debug: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.LIATRIO_BOT_PRIVATE_REPO_ACCESS_PAT }}
+
+  publish-image:
+    uses: ./.github/workflows/build-java.yml
+    needs: release
+    if: needs.release.outputs.changed == 'true'
+    with:
+      tagTypes: |
+        type=semver,pattern={{version}},value=${{ needs.release.outputs.newVersion }}
+        type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}

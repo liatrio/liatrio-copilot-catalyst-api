@@ -1,0 +1,191 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.18'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'java'
+
+    // TODO: Review the following plugins
+    id 'com.github.johnrengelman.processes' version "0.5.0"
+    id 'org.springdoc.openapi-gradle-plugin' version "1.8.0"
+    id 'org.asciidoctor.jvm.convert' version '2.4.0'
+    id "io.gatling.gradle" version "3.10.5"
+}
+
+group = 'com.liatrio'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    contractTestImplementation.extendsFrom(testImplementation)
+    contractTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+//    asciidoctorExt
+}
+
+sourceSets {
+	gatling {
+		java.srcDirs = ["src/performanceTest/java"]
+		resources.srcDirs = ["src/performanceTest/resources"]
+	}
+	contractTest {
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+
+		java {
+		}
+	}
+	functionalTest {
+		java {
+			java.srcDirs=["src/functionalTest/java"]
+		}
+	}
+}
+
+allprojects {
+    tasks.withType(Test).tap {
+        configureEach {
+            testLogging {
+                exceptionFormat "full"
+                showCauses true
+                showExceptions true
+                showStackTraces true
+                showStandardStreams true
+                events = ["passed", "skipped", "failed"]
+            }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.18'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.18'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.7.18'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.7.18'
+    implementation 'org.springframework.security:spring-security-config:5.8.11'
+    implementation 'org.springframework.security:spring-security-web:5.8.11'
+    implementation 'org.springframework.security:spring-security-core:5.8.11'
+    implementation 'org.springframework.data:spring-data-rest-core:3.7.18'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.3'
+//    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0' // TODO: use instead of springdoc-openapi-ui once this project is updated to Spring Boot 3.x
+    implementation 'org.springdoc:springdoc-openapi-ui:1.8.0'
+
+//    TODO: Seem to be unused - in the process of reviewing
+//    implementation 'jakarta.persistence:jakarta.persistence-api:2.2.3'
+//    implementation 'org.apache.tomcat.embed:tomcat-embed-core:9.0.86'
+//    implementation 'org.springframework.boot:spring-boot-autoconfigure:2.7.18'
+//    implementation 'org.springframework.boot:spring-boot:2.7.18'
+//    implementation 'org.springframework.data:spring-data-commons:2.7.18'
+//    implementation 'org.springframework.data:spring-data-jpa:2.7.18'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-rest:2.7.18'
+//    implementation 'org.springframework:spring-context:5.3.32'
+//    implementation 'org.springframework:spring-web:6.0.17'
+
+    runtimeOnly 'com.h2database:h2:2.2.224'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.18'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security:2.7.18'
+    testImplementation 'org.springframework.security:spring-security-test:5.8.11'
+    testImplementation 'org.springframework.security:spring-security-config:5.8.11'
+    testImplementation 'org.springframework.security:spring-security-web:5.8.11'
+    testImplementation 'org.mockito:mockito-core:4.11.0'
+
+//    Seem to be unused
+//    testImplementation 'org.springframework.boot:spring-boot-starter-web:2.7.18'
+//    testImplementation 'com.vaadin.external.google:android-json:0.0.20131108.vaadin1'
+//    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+//    testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure:2.7.18'
+//    testImplementation 'org.springframework.boot:spring-boot-test:2.7.18'
+//    testImplementation 'org.springframework:spring-beans:5.3.32'
+//    testImplementation 'org.springframework:spring-test:5.3.32'
+//    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+//    }
+//    testImplementation 'org.springframework.security:spring-security-test'
+//   testImplementation 'org.springframework:spring-webmvc:5.3.32'
+//    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.2'
+
+    contractTestImplementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.23'
+    contractTestImplementation 'au.com.dius.pact.provider:junit5:4.6.8'
+
+
+    functionalTestImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.18'
+    functionalTestImplementation 'org.springframework.security:spring-security-test:5.8.11'
+    functionalTestImplementation 'io.rest-assured:spring-mock-mvc:4.5.1'
+    functionalTestImplementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+
+//    Seem to be unused
+//    functionalTestImplementation 'org.junit.platform:junit-platform-suite-api:1.10.2'
+//    functionalTestImplementation 'com.google.code.gson:gson:2.10.1'
+//    functionalTestImplementation 'org.apache.johnzon:johnzon-core:1.2.21'
+
+//    asciidoctorExt 'org.asciidoctor:asciidoctorj:2.5.11'
+    zinc 'org.scala-sbt:zinc_2.12:1.9.6'
+}
+
+springBoot {
+  mainClass = 'com.liatrio.dojo.devopsknowledgeshareapi.Application'
+}
+
+bootJar {
+   archiveFileName = 'devops-knowledge-share-api.jar'
+}
+
+test {
+    outputs.dir snippetsDir
+    useJUnitPlatform()
+}
+
+task contractTest(type: Test) {
+	description = "Run contract tests"
+	group = "verification"
+
+	testClassesDirs = sourceSets.contractTest.output.classesDirs
+	classpath = sourceSets.contractTest.runtimeClasspath
+
+	useJUnitPlatform()
+
+	systemProperty "spring.profiles.active", "local"
+	systemProperty "pact.provider.version", System.env.PACT_PROVIDER_VERSION ?: "0.0.0"
+	systemProperty 'pactbroker.host', System.env.PACT_BROKER_URL ?: "localhost"
+	systemProperty 'pactbroker.port', System.env.PACT_BROKER_PORT ?: "9292"
+	systemProperty 'pactbroker.scheme', System.env.PACT_BROKER_SCHEME ?: 'http'
+	systemProperty 'pactbroker.auth.username', System.env.PACT_BROKER_USERNAME ?: ""
+	systemProperty 'pactbroker.auth.password', System.env.PACT_BROKER_PASSWORD ?: ""
+	systemProperty 'pact.verifier.publishResults', true
+}
+
+
+task functionalTest(type: Test) {
+	description = "Run functional tests"
+	group = "verification"
+
+	testClassesDirs = sourceSets.functionalTest.output.classesDirs
+	classpath = sourceSets.functionalTest.runtimeClasspath
+
+	useJUnitPlatform()
+
+	systemProperties = System.properties
+
+    testLogging {
+        exceptionFormat = 'full'
+        events = ["passed", "failed", "skipped"]
+        showStandardStreams = true
+    }
+}
+
+//asciidoctor {
+//    configurations 'asciidoctorExt'
+//    inputs.dir snippetsDir
+//    dependsOn test
+//}
