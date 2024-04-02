@@ -26,6 +26,8 @@ public class Post {
     private @NonNull String imageUrl;
     private @NonNull Date dateAsDate;
 
+    private String dateUpdated;
+
     public Post() {
         this.dateAsDate = Calendar.getInstance().getTime();
         setDatePosted(dateAsDate);
@@ -86,6 +88,15 @@ public class Post {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public void setDateUpdated(Date dateAsDate) {
+        DateFormat dateFormat = new SimpleDateFormat(dateFormat());
+        this.dateUpdated = dateFormat.format(dateAsDate);
+    }
+
+    public String getDateUpdated() {
+        return dateUpdated;
     }
 
     public boolean validatePostLink(String postLink) {
