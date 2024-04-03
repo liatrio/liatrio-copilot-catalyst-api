@@ -1,8 +1,11 @@
 package com.liatrio.dojo.devopsknowledgeshareapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -105,5 +108,16 @@ public class PostTest {
         hc.setImageUrl(imageUrl);
         String test = hc.getImageUrl();
         assertEquals(imageUrl, test);
+    }
+
+    @Test
+    public void setDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = new Date();
+        hc.setDateUpdated(date);
+        DateFormat dateFormat = new SimpleDateFormat(hc.dateFormat());
+        String expected = dateFormat.format(date);
+        String actual = hc.getDateUpdated();
+        assertEquals(expected, actual);
     }
 }
