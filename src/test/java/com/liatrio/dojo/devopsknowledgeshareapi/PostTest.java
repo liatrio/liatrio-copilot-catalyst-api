@@ -2,11 +2,16 @@ package com.liatrio.dojo.devopsknowledgeshareapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Date;
+
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 
 @ExtendWith(SpringExtension.class)
 public class PostTest {
@@ -16,7 +21,6 @@ public class PostTest {
     String title = "devops";
     String link = "https://devops.com/blog/post-1";
     String imageUrl = "https://devops.com/images/image1.png";
-
 
     @Test
     public void getIdTest() throws Exception {
@@ -105,5 +109,16 @@ public class PostTest {
         hc.setImageUrl(imageUrl);
         String test = hc.getImageUrl();
         assertEquals(imageUrl, test);
+    }
+
+    @Test
+    public void setDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = new Date();
+        hc.setDateUpdated(date);
+        String test = hc.getDateUpdated();
+        DateFormat dateFormat = new SimpleDateFormat(hc.dateFormat());
+        String expected = dateFormat.format(date);
+        assertEquals(expected, test);
     }
 }
