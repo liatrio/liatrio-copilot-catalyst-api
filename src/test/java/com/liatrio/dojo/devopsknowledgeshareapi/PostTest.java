@@ -1,12 +1,18 @@
 package com.liatrio.dojo.devopsknowledgeshareapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Date;
+
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import java.text.DateFormat; // Import the DateFormat class
+import java.text.SimpleDateFormat;
 
 @ExtendWith(SpringExtension.class)
 public class PostTest {
@@ -105,5 +111,46 @@ public class PostTest {
         hc.setImageUrl(imageUrl);
         String test = hc.getImageUrl();
         assertEquals(imageUrl, test);
+    }
+
+    @Test
+    public void setDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = new Date();
+        hc.setDateUpdated(date);
+        String test = hc.getDateUpdated();
+        DateFormat dateFormat = new SimpleDateFormat(hc.dateFormat());
+        String expected = dateFormat.format(date);
+        assertEquals(expected, test);
+    }
+
+    @Test
+    public void getDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = new Date();
+        hc.setDateUpdated(date);
+        String test = hc.getDateUpdated();
+        DateFormat dateFormat = new SimpleDateFormat(hc.dateFormat());
+        String expected = dateFormat.format(date);
+        assertEquals(expected, test);
+    }
+
+    @Test
+    public void validatePostLinkTest() {
+        Post hc = new Post();
+        String validLink = "https://example.com";
+        boolean validResult = hc.validatePostLink(validLink);
+        assertTrue(validResult);
+
+        String invalidLink = "example.com";
+        boolean invalidResult = hc.validatePostLink(invalidLink);
+        assertFalse(invalidResult);
+    }
+
+    @Test
+    public void dateFormatTest() {
+        Post hc = new Post();
+        String test = hc.dateFormat();
+        assertEquals("yyyy-MM-dd", test);
     }
 }
