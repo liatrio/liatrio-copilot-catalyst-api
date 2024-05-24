@@ -31,6 +31,20 @@ public class PostController {
         return repository.save(post);
     }
 
+    @PutMapping("/posts/{id}")
+    public Post putPost(@PathVariable("id") String id, @RequestBody Post updatedPost) throws Exception {
+        log.info("{}: received a PUT request", deploymentType);
+        Post existingPost = repository.findById(Long.parseLong(id)).orElse(null);
+        if (existingPost != null) {
+            existingPost.setFirstName(updatedPost.getFirstName());
+            existingPost.setTitle(updatedPost.getTitle());
+            existingPost.setLink(updatedPost.getLink());
+            return repository.save(existingPost);
+        } else {
+            throw new IllegalArgumentException("Post not found with id: " + id);
+        }
+    }
+
     @DeleteMapping("/posts/{id}")
     public void deletePost(@PathVariable("id") String id) {
         log.info("{}: recieved a DELETE request", deploymentType);
