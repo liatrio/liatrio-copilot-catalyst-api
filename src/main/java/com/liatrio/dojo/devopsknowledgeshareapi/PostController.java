@@ -1,7 +1,9 @@
 package com.liatrio.dojo.devopsknowledgeshareapi;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
@@ -27,8 +29,41 @@ public class PostController {
 
     @PostMapping("/posts")
     public Post post(@RequestBody Post post, HttpServletResponse resp) {
-        log.info("{}: recieved a POST request", deploymentType);
-        return repository.save(post);
+        try {
+            log.info("{}: recieved a POST request", deploymentType);
+            return repository.save(post);
+        } catch (Exception e) {
+            // Handle the exception here
+            log.error("An error occurred while saving the post.", e);
+            // return an appropriate response or throw a custom exception
+            throw new RuntimeException("An error occurred while saving the post.", e);
+        }
+    }
+
+    @PutMapping("/posts/{id}")
+    public ResponseEntity<Post> putPost(@PathVariable Long id, @RequestBody Post postDetails) {
+        Optional<Post> optionalPost = repository.findById(id);
+    
+        if (!optionalPost.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+    
+        Post post = optionalPost.get();
+        post.setFirstName(postDetails.getFirstName());
+        post.setTitle(postDetails.getTitle());
+        try {
+            post.setLink(postDetails.getLink());
+        } catch (Exception e) {
+            // Handle the exception here
+            log.error("An error occurred while setting the link.", e);
+            // return an appropriate response or throw a custom exception
+            throw new RuntimeException("An error occurred while setting the link.", e);
+        }
+        // set other fields as needed
+    
+        repository.save(post);
+    
+        return ResponseEntity.ok(post);
     }
 
     @DeleteMapping("/posts/{id}")
