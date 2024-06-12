@@ -1,9 +1,12 @@
 package com.liatrio.dojo.devopsknowledgeshareapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.util.*;
+import java.text.SimpleDateFormat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -105,5 +108,43 @@ public class PostTest {
         hc.setImageUrl(imageUrl);
         String test = hc.getImageUrl();
         assertEquals(imageUrl, test);
+    }
+
+    @Test
+    public void setDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = new Date();
+        hc.setDateUpdated(date);
+        String test = hc.getDateUpdated();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(hc.dateFormat());
+        String expected = dateFormat.format(date);
+        assertEquals(expected, test);
+    }
+
+    @Test
+    public void getDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = new Date();
+        hc.setDateUpdated(date);
+        String test = hc.getDateUpdated();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(hc.dateFormat());
+        String expected = dateFormat.format(date);
+        assertEquals(expected, test);
+    }
+
+    @Test
+    public void validatePostLinkValidTest() {
+        Post hc = new Post();
+        String validLink = "https://example.com";
+        boolean result = hc.validatePostLink(validLink);
+        assertTrue(result);
+    }
+
+    @Test
+    public void validatePostLinkInvalidTest() {
+        Post hc = new Post();
+        String invalidLink = "example.com";
+        boolean result = hc.validatePostLink(invalidLink);
+        assertFalse(result);
     }
 }
