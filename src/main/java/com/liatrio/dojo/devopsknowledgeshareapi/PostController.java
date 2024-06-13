@@ -1,9 +1,13 @@
 package com.liatrio.dojo.devopsknowledgeshareapi;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
 import javax.servlet.http.HttpServletResponse;
+
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -29,6 +33,25 @@ public class PostController {
     public Post post(@RequestBody Post post, HttpServletResponse resp) {
         log.info("{}: recieved a POST request", deploymentType);
         return repository.save(post);
+    }
+
+    @PutMapping("/posts/{id}")
+    public ResponseEntity<Post> putPost(@PathVariable Long id, @RequestBody Post updatedPost) {
+        return repository.findById(id)
+                .map(post -> {
+                    post.setFirstName(updatedPost.getFirstName());
+                    post.setTitle(updatedPost.getTitle());
+                    try {
+                        post.setLink(updatedPost.getLink());
+                    } catch (Exception e) {
+                        return new ResponseEntity<Post>(HttpStatus.BAD_REQUEST);
+                    }
+                    post.setImageUrl(updatedPost.getImageUrl());
+                    post.setDatePosted(Calendar.getInstance().getTime());
+                    Post savedPost = repository.save(post);
+                    return new ResponseEntity<Post>(savedPost, HttpStatus.OK);
+                })
+                .orElseGet(() -> new ResponseEntity<Post>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/posts/{id}")

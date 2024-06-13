@@ -25,6 +25,16 @@ public class Post {
     private @NonNull String datePosted;
     private @NonNull String imageUrl;
     private @NonNull Date dateAsDate;
+    private String dateUpdated;
+
+    public void setDateUpdated(Date dateAsDate) {
+        DateFormat dateFormat = new SimpleDateFormat(dateFormat());
+        this.dateUpdated = dateFormat.format(dateAsDate);
+    }
+
+    public String getDateUpdated() {
+        return dateUpdated;
+    }
 
     public Post() {
         this.dateAsDate = Calendar.getInstance().getTime();
