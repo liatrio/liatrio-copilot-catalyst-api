@@ -1,5 +1,6 @@
 package com.liatrio.dojo.devopsknowledgeshareapi;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,25 @@ public class PostController {
     public Post post(@RequestBody Post post, HttpServletResponse resp) {
         log.info("{}: recieved a POST request", deploymentType);
         return repository.save(post);
+    }
+
+    @PutMapping("/posts/{id}")
+    public Post updatePost(@PathVariable Long id, @RequestBody Post newPost) {
+        return repository.findById(id)
+            .map(post -> {
+                post.setTitle(newPost.getTitle());
+                post.setFirstName(newPost.getFirstName());
+                try {
+                    post.setLink(newPost.getLink());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return repository.save(post);
+            })
+            .orElseGet(() -> {
+                newPost.setId(id);
+                return repository.save(newPost);
+            });
     }
 
     @DeleteMapping("/posts/{id}")

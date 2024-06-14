@@ -88,6 +88,17 @@ public class Post {
         this.imageUrl = imageUrl;
     }
 
+    private String dateUpdated;
+
+    public void setDateUpdated(Date dateAsDate) {
+        DateFormat dateFormat = new SimpleDateFormat(dateFormat());
+        this.dateUpdated = dateFormat.format(dateAsDate);
+    }
+
+    public String getDateUpdated() {
+        return dateUpdated;
+    }
+
     public boolean validatePostLink(String postLink) {
         String pattern = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
         return postLink.matches(pattern);
