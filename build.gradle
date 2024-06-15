@@ -74,7 +74,7 @@ dependencies {
     implementation 'org.springframework.security:spring-security-web:5.8.11'
     implementation 'org.springframework.security:spring-security-core:5.8.11'
     implementation 'org.springframework.data:spring-data-rest-core:3.7.18'
-    implementation 'net.logstash.logback:logstash-logback-encoder:7.3'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 //    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0' // TODO: use instead of springdoc-openapi-ui once this project is updated to Spring Boot 3.x
     implementation 'org.springdoc:springdoc-openapi-ui:1.8.0'
 
