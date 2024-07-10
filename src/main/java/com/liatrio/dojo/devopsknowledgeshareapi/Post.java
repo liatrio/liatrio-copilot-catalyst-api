@@ -63,7 +63,7 @@ public class Post {
         if (this.validatePostLink(link)) {
             this.link = link;
         } else {
-            throw new Exception("Invalid link format ");
+            throw new Exception("Invalid link format: " + link);
         }
     }
 
