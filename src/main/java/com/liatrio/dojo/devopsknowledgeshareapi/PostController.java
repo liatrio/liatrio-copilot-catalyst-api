@@ -21,13 +21,26 @@ public class PostController {
 
     @GetMapping("/posts")
     public Collection<Post> posts() {
-        log.info("{}: recieved a GET request", deploymentType);
+        log.info("{}: received a GET request", deploymentType);
         return repository.findAll().stream().collect(Collectors.toList());
+    }
+
+    @GetMapping("/posts/title/{title}")
+    public Collection<Post> getPostsByTitle(@PathVariable("title") String title) {
+        log.info("{}: received a GET request for posts with title: {}", deploymentType, title);
+        return repository.findByTitle(title);
     }
 
     @PostMapping("/posts")
     public Post post(@RequestBody Post post, HttpServletResponse resp) {
         log.info("{}: recieved a POST request", deploymentType);
+        return repository.save(post);
+    }
+
+    @PutMapping("/posts/{id}")
+    public Post putPost(@PathVariable("id") String id, @RequestBody Post post) {
+        log.info("{}: received a PUT request", deploymentType);
+        post.setId(Long.parseLong(id));
         return repository.save(post);
     }
 
