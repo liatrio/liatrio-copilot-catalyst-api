@@ -1,7 +1,13 @@
 package com.liatrio.dojo.devopsknowledgeshareapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
@@ -16,7 +22,6 @@ public class PostTest {
     String title = "devops";
     String link = "https://devops.com/blog/post-1";
     String imageUrl = "https://devops.com/images/image1.png";
-
 
     @Test
     public void getIdTest() throws Exception {
@@ -105,5 +110,43 @@ public class PostTest {
         hc.setImageUrl(imageUrl);
         String test = hc.getImageUrl();
         assertEquals(imageUrl, test);
+    }
+
+    @Test
+    public void setDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = new Date();
+        hc.setDateUpdated(date);
+        String test = hc.getDateUpdated();
+        DateFormat dateFormat = new SimpleDateFormat(hc.dateFormat());
+        String expected = dateFormat.format(date);
+        assertEquals(expected, test);
+    }
+
+    @Test
+    public void getDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = new Date();
+        hc.setDateUpdated(date);
+        String test = hc.getDateUpdated();
+        DateFormat dateFormat = new SimpleDateFormat(hc.dateFormat());
+        String expected = dateFormat.format(date);
+        assertEquals(expected, test);
+    }
+
+    @Test
+    public void validatePostLinkValidTest() {
+        Post hc = new Post();
+        String validLink = "https://example.com";
+        boolean result = hc.validatePostLink(validLink);
+        assertTrue(result);
+    }
+
+    @Test
+    public void validatePostLinkInvalidTest() {
+        Post hc = new Post();
+        String invalidLink = "example.com";
+        boolean result = hc.validatePostLink(invalidLink);
+        assertFalse(result);
     }
 }
