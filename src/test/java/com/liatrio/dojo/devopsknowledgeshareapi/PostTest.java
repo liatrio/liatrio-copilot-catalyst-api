@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 @ExtendWith(SpringExtension.class)
 public class PostTest {
@@ -105,5 +109,25 @@ public class PostTest {
         hc.setImageUrl(imageUrl);
         String test = hc.getImageUrl();
         assertEquals(imageUrl, test);
+    }
+    
+    @Test
+    public void setDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = Calendar.getInstance().getTime();
+        hc.setDateUpdated(date);
+        DateFormat dateFormat = new SimpleDateFormat(hc.dateFormat());
+        String expectedDate = dateFormat.format(date);
+        assertEquals(expectedDate, hc.getDateUpdated());
+    }
+
+    @Test
+    public void getDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = Calendar.getInstance().getTime();
+        hc.setDateUpdated(date);
+        DateFormat dateFormat = new SimpleDateFormat(hc.dateFormat());
+        String expectedDate = dateFormat.format(date);
+        assertEquals(expectedDate, hc.getDateUpdated());
     }
 }
