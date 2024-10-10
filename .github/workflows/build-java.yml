@@ -40,7 +40,7 @@ jobs:
         run: ./gradlew bootJar
 
       - name: Upload JAR
-        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
         with:
           name: dks-api
           path: build/libs/devops-knowledge-share-api.jar
@@ -136,7 +136,7 @@ jobs:
           TRIVY_USERNAME: trivy
           TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3
+      - uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3
         with:
           name: 'trivy-results'
           path: 'trivy-results.sarif'
@@ -152,7 +152,7 @@ jobs:
           TRIVY_USERNAME: trivy
           TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3
+      - uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3
         with:
           name: 'trivy-sbom'
           path: 'dependency-results.sbom.json'
