@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @ExtendWith(SpringExtension.class)
 public class PostTest {
@@ -105,5 +107,23 @@ public class PostTest {
         hc.setImageUrl(imageUrl);
         String test = hc.getImageUrl();
         assertEquals(imageUrl, test);
+    }
+
+    @Test
+    public void setDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2023-10-01");
+        hc.setDateUpdated(date);
+        String expectedDate = new SimpleDateFormat(hc.dateFormat()).format(date);
+        assertEquals(expectedDate, hc.getDateUpdated());
+    }
+
+    @Test
+    public void getDateUpdatedTest() throws Exception {
+        Post hc = new Post();
+        Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2023-10-01");
+        hc.setDateUpdated(date);
+        String expectedDate = new SimpleDateFormat(hc.dateFormat()).format(date);
+        assertEquals(expectedDate, hc.getDateUpdated());
     }
 }
