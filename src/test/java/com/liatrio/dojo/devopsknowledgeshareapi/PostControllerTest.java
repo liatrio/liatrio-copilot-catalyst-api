@@ -68,4 +68,28 @@ public class PostControllerTest {
                 .andDo(print()).andExpect(status().isOk());
         this.mockMvc.perform(delete("/posts/1/").with(csrf())).andDo(print()).andExpect(status().isOk());
     }
+
+    @Test
+    public void getPostsByTitle() throws Exception {
+        this.mockMvc.perform(get("/posts/title")
+                .param("title", "My First Post"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getPostsByFirstName() throws Exception {
+        this.mockMvc.perform(get("/posts/firstname")
+                .param("firstName", "John"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getPostsByLink() throws Exception {
+        this.mockMvc.perform(get("/posts/link")
+                .param("link", "https://www.example.com/blog/post-1"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
 }
