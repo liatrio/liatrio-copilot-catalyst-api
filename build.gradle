@@ -70,9 +70,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.18'
     implementation 'org.springframework.boot:spring-boot-starter-actuator:2.7.18'
     implementation 'org.springframework.boot:spring-boot-starter-security:2.7.18'
-    implementation 'org.springframework.security:spring-security-config:5.8.11'
-    implementation 'org.springframework.security:spring-security-web:5.8.11'
-    implementation 'org.springframework.security:spring-security-core:5.8.11'
+    implementation 'org.springframework.security:spring-security-config:5.8.15'
+    implementation 'org.springframework.security:spring-security-web:5.8.15'
+    implementation 'org.springframework.security:spring-security-core:5.8.15'
     implementation 'org.springframework.data:spring-data-rest-core:3.7.18'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.3'
 //    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0' // TODO: use instead of springdoc-openapi-ui once this project is updated to Spring Boot 3.x
@@ -96,9 +96,9 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.18'
     testImplementation 'org.springframework.boot:spring-boot-starter-security:2.7.18'
-    testImplementation 'org.springframework.security:spring-security-test:5.8.11'
-    testImplementation 'org.springframework.security:spring-security-config:5.8.11'
-    testImplementation 'org.springframework.security:spring-security-web:5.8.11'
+    testImplementation 'org.springframework.security:spring-security-test:5.8.15'
+    testImplementation 'org.springframework.security:spring-security-config:5.8.15'
+    testImplementation 'org.springframework.security:spring-security-web:5.8.15'
     testImplementation 'org.mockito:mockito-core:4.11.0'
 
 //    Seem to be unused
@@ -120,7 +120,7 @@ dependencies {
 
 
     functionalTestImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.18'
-    functionalTestImplementation 'org.springframework.security:spring-security-test:5.8.11'
+    functionalTestImplementation 'org.springframework.security:spring-security-test:5.8.15'
     functionalTestImplementation 'io.rest-assured:spring-mock-mvc:4.5.1'
     functionalTestImplementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
 
