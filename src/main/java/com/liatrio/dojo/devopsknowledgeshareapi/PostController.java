@@ -36,4 +36,13 @@ public class PostController {
         log.info("{}: recieved a DELETE request", deploymentType);
         repository.deleteById(Long.parseLong(id));
     }
+
+    @PutMapping("/posts/{id}")
+    public Post updatePost(@PathVariable("id") String id, @RequestBody Post post) {
+        log.info("{}: received a PUT request", deploymentType);
+        Post existingPost = repository.findById(Long.parseLong(id)).orElseThrow();
+        existingPost.setTitle(post.getTitle());
+        existingPost.setContent(post.getContent());
+        return repository.save(existingPost);
+    }
 }

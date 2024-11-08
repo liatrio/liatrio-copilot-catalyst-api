@@ -92,4 +92,14 @@ public class Post {
         String pattern = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
         return postLink.matches(pattern);
     }
+
+    public Object getContent() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getContent'");
+    }
+
+    public void setContent(Object content) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setContent'");
+    }
 }
