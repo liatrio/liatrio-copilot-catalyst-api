@@ -75,7 +75,7 @@ public class Post {
         return "EE MM/dd/yyyy H:m:s:S z";
     }
 
-    public void setDatePosted(Date dateAsDate) {
+    public void setDatePosted(String dateAsDate) {
         DateFormat dateFormat = new SimpleDateFormat(dateFormat());
         this.datePosted = dateFormat.format(dateAsDate);
     }
