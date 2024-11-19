@@ -5,6 +5,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+
+import java.util.Optional;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
@@ -67,5 +72,70 @@ public class PostControllerTest {
                 post("/posts").content(testPost.toString()).with(csrf()).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print()).andExpect(status().isOk());
         this.mockMvc.perform(delete("/posts/1/").with(csrf())).andDo(print()).andExpect(status().isOk());
+    }
+
+    @Test
+    public void updatePostSuccess() throws Exception {
+        Post updatedPost = new Post();
+        updatedPost.setFirstName("Jane");
+        updatedPost.setTitle("Updated Post");
+        updatedPost.setLink("https://www.example.com/blog/updated-post");
+        updatedPost.setDatePosted("2023-10-10");
+        updatedPost.setImageUrl("https://www.example.com/images/updated-post.jpg");
+
+        when(mockPr.findById(1L)).thenReturn(Optional.of(new Post()));
+        when(mockPr.save(any(Post.class))).thenReturn(updatedPost);
+
+        JSONObject updatedPostJson = new JSONObject();
+        updatedPostJson.put("firstName", "Jane");
+        updatedPostJson.put("title", "Updated Post");
+        updatedPostJson.put("link", "https://www.example.com/blog/updated-post");
+        updatedPostJson.put("datePosted", "2023-10-10");
+        updatedPostJson.put("imageUrl", "https://www.example.com/images/updated-post.jpg");
+
+        this.mockMvc.perform(put("/posts/1")
+                .content(updatedPostJson.toString())
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void updatePostNotFound() throws Exception {
+        JSONObject updatedPostJson = new JSONObject();
+        updatedPostJson.put("firstName", "Jane");
+        updatedPostJson.put("title", "Updated Post");
+        updatedPostJson.put("link", "https://www.example.com/blog/updated-post");
+        updatedPostJson.put("datePosted", "2023-10-10");
+        updatedPostJson.put("imageUrl", "https://www.example.com/images/updated-post.jpg");
+
+        when(mockPr.findById(1L)).thenReturn(Optional.empty());
+
+        this.mockMvc.perform(put("/posts/1")
+                .content(updatedPostJson.toString())
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void updatePostBadRequest() throws Exception {
+        JSONObject updatedPostJson = new JSONObject();
+        updatedPostJson.put("firstName", "Jane");
+        updatedPostJson.put("title", "Updated Post");
+        updatedPostJson.put("link", "https://www.example.com/blog/updated-post");
+        updatedPostJson.put("datePosted", "invalid-date");
+        updatedPostJson.put("imageUrl", "https://www.example.com/images/updated-post.jpg");
+
+        when(mockPr.findById(1L)).thenReturn(Optional.of(new Post()));
+
+        this.mockMvc.perform(put("/posts/1")
+                .content(updatedPostJson.toString())
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 }
