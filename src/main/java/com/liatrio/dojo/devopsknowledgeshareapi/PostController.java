@@ -25,6 +25,21 @@ public class PostController {
         return repository.findAll().stream().collect(Collectors.toList());
     }
 
+    @PutMapping("/posts/{id}")
+    public Post putPosts(@PathVariable("id") Long id, @RequestBody Post newPost) {
+        log.info("{}: received a PUT request", deploymentType);
+        return repository.findById(id)
+            .map(post -> {
+                post.setTitle(newPost.getTitle());
+                post.setContent(newPost.getContent());
+                return repository.save(post);
+            })
+            .orElseGet(() -> {
+                newPost.setId(id);
+                return repository.save(newPost);
+            });
+    }
+
     @PostMapping("/posts")
     public Post post(@RequestBody Post post, HttpServletResponse resp) {
         log.info("{}: recieved a POST request", deploymentType);
